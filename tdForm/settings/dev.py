@@ -18,4 +18,4 @@ DATABASES = {
 }
 
 # 用nginx代理的子路径，用于修改根urls，为了使内部调试环境和生产url一致
-PROXY_PATH = '^tdform_dev/'
+PROXY_PATH = ''
