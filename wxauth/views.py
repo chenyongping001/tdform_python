@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 
 from django.conf import settings
-from wxauth.models import WXUser
+from wxauth.models import WXUser,HfWxUser
 
 # Create your views here.
 
@@ -39,7 +39,7 @@ def wx_auth(request, code):
     return JsonResponse(data)
 
 
-def wx_getPhoneNumber(request, code):
+def wx_getHfWxUser(request,code,session):
     wxapi_get_access_token = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={AppId}&secret={AppSecret}".format(
         AppId=settings.WX_MINIPROGRAM_APPID,
         AppSecret=settings.WX_MINIPROGRAM_SECRET_KEY
@@ -62,6 +62,15 @@ def wx_getPhoneNumber(request, code):
         json={'code': code}
     )
 
+
     if(response.json().get('errcode') == 0):
-        return JsonResponse({"phone_info": response.json().get('phone_info')})
+        phone_number = response.json().get('phone_info').get('phoneNumber')
+        wx_user = WXUser.objects.filter(session=session).first()
+        hf_user = HfWxUser.objects.filter(phone_number=phone_number).first()
+        if(wx_user):
+            wx_user.phone_number = phone_number
+            if(hf_user):
+                return JsonResponse({"wx_username": hf_user.username})
+
+        return JsonResponse({"wx_username": None})
     return JsonResponse({"phone_info": None})
