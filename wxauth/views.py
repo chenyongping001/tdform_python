@@ -1,4 +1,5 @@
 # from asyncio.windows_events import NULL
+from contextlib import nullcontext
 import requests
 import hashlib
 from django.shortcuts import render
@@ -69,8 +70,17 @@ def wx_getHfWxUser(request,code,session):
         hf_user = HfWxUser.objects.filter(phone_number=phone_number).first()
         if(wx_user):
             wx_user.phone_number = phone_number
+            wx_user.save()
             if(hf_user):
                 return JsonResponse({"wx_username": hf_user.username})
 
         return JsonResponse({"wx_username": None})
     return JsonResponse({"phone_info": None})
+
+def wx_getUserFromSession(request,session):
+    wx_user = WXUser.objects.filter(session=session).first()
+    if(wx_user and wx_user.phone_number):
+        hf_user = HfWxUser.objects.filter(phone_number=wx_user.phone_number).first()
+        if(hf_user):
+            return JsonResponse({"wx_username": hf_user.username})
+    return JsonResponse({"wx_username": None})

@@ -31,6 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('covidform/', include('covidform.urls')),
     path('wxauth/', include('wxauth.urls')),
+    path('outsourcingManagement/', include('outsourcingManagement.urls')),
     re_path(r'^static/(?P<path>.*)$', return_static, name='static'),
     re_path(r'^uploads/(?P<path>.*)$', static_serve,
             {'document_root': settings.MEDIA_ROOT}),

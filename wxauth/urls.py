@@ -6,4 +6,6 @@ urlpatterns = [
     path('<str:code>', views.wx_auth, name='wx_auth'),
     path('wx_getHfWxUser/<str:code>/<str:session>',
          views.wx_getHfWxUser, name='wx_getHfWxUser'),
+    path('wx_getUserFromSession/<str:session>',
+         views.wx_getUserFromSession, name='wx_getUserFromSession'),
 ]
