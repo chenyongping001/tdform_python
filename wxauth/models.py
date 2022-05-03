@@ -13,4 +13,5 @@ class WXUser(models.Model):
 class HfWxUser(models.Model):
     username = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=20)
+    can_add = models.BooleanField(default=False)
 

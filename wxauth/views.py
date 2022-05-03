@@ -82,5 +82,8 @@ def wx_getUserFromSession(request,session):
     if(wx_user and wx_user.phone_number):
         hf_user = HfWxUser.objects.filter(phone_number=wx_user.phone_number).first()
         if(hf_user):
-            return JsonResponse({"wx_username": hf_user.username})
+            return JsonResponse({
+                "wx_username": hf_user.username,
+                "can_add":hf_user.can_add,
+                })
     return JsonResponse({"wx_username": None})

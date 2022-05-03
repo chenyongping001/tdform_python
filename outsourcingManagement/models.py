@@ -4,6 +4,7 @@ from django.conf import settings
 # Create your models here.
 class Workbook(models.Model):
     wx_session = models.CharField(max_length=255)
+    wx_username = models.CharField(max_length=10)
     rq = models.DateField()
     yh = models.CharField(max_length=10)
     sbhxt = models.CharField(max_length=255)
