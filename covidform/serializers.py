@@ -1,4 +1,4 @@
-from .models import TempInto, TempintoFile, OvertimeInto, OvertimeIntoFile
+from .models import TempInto, TempintoFile, OvertimeInto, OvertimeIntoFile,Clrc,ClrcFile
 from rest_framework import serializers
 
 
@@ -35,6 +35,7 @@ class TempIntoSerializer(serializers.ModelSerializer):
                   "status",
                   "files"]
 
+# ------------------------------------------------------------
 
 class OvertimeIntoFileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +45,6 @@ class OvertimeIntoFileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         overtimeinto_id = self.context['overtimeinto_id']
         return OvertimeIntoFile.objects.create(overtimeinto_id=overtimeinto_id, **validated_data)
-
 
 class OvertimeIntoSerializer(serializers.ModelSerializer):
     files = serializers.StringRelatedField(many=True, read_only=True)
@@ -61,6 +61,41 @@ class OvertimeIntoSerializer(serializers.ModelSerializer):
                   "contact",
                   "contactPhone",
                   "createtime",
+                  "last_update",
+                  "status",
+                  "files"]
+
+# --------------------------------------------------------
+
+class ClrcFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClrcFile
+        fields = ['file']
+
+    def create(self, validated_data):
+        clrc_id = self.context['clrc_id']
+        return ClrcFile.objects.create(clrc_id=clrc_id, **validated_data)
+
+
+class ClrcSerializer(serializers.ModelSerializer):
+    files = serializers.StringRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Clrc
+        fields = ["id",
+                  "wx_session",
+                  "gcmc",
+                  "sgdw",
+                  "jhjcksrq",
+                  "jhjcjsrq",
+                  "cx",
+                  "cphm",
+                  "tssgcl",
+                  "jsy",
+                  "sqly",
+                  "dclxrxm",
+                  "dclxrsj",
+                  "create_time",
                   "last_update",
                   "status",
                   "files"]

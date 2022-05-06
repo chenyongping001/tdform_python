@@ -99,3 +99,46 @@ class OvertimeIntoFile(models.Model):
 
     def __str__(self):
         return settings.MEDIA_URL+str(self.file)
+
+
+
+# 临时车辆入厂
+class Clrc(models.Model):
+    TSSGCL_CHOICE = [
+        (0, '否'),
+        (1, '是'),
+    ]
+    STATUS_CHOICE = [
+        (0, '待处理'),
+        (1, '找不到联系人'),
+        (2, '已生成申请单'),
+        (3, '审批中'),
+        (4, '通过'),
+        (5, '删除'),
+    ]
+    wx_session = models.CharField(max_length=255)
+    gcmc = models.CharField(max_length=255)
+    sgdw = models.CharField(max_length=255)
+    jhjcksrq = models.DateField()
+    jhjcjsrq = models.DateField()
+    cx = models.CharField(max_length=20)
+    cphm = models.CharField(max_length=10)
+    tssgcl = models.PositiveSmallIntegerField(
+        choices=TSSGCL_CHOICE, default=0)
+    jsy = models.CharField(max_length=10)
+    sqly = models.TextField()
+    dclxrxm = models.CharField(max_length=10)
+    dclxrsj = models.CharField(max_length=11)
+    create_time = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS_CHOICE, default=0)
+
+
+class ClrcFile(models.Model):
+    file = models.FileField(upload_to='clrc/')
+    clrc = models.ForeignKey(
+        Clrc, related_name='files', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return settings.MEDIA_URL+str(self.file)
