@@ -125,7 +125,7 @@ class Clrc(models.Model):
     cphm = models.CharField(max_length=10)
     tssgcl = models.PositiveSmallIntegerField(
         choices=TSSGCL_CHOICE, default=0)
-    jsy = models.CharField(max_length=10)
+    jsy = models.CharField(max_length=10,blank=True,null=True)
     sqly = models.TextField()
     dclxrxm = models.CharField(max_length=10)
     dclxrsj = models.CharField(max_length=11)

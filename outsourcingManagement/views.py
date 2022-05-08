@@ -38,8 +38,8 @@ class WorkbookViewSet(viewsets.ModelViewSet):
                 if(int_page>0 and int_page<=max_page):
                     start = (int_page -1)*int_pagesize
                     end = int_page * int_pagesize
-                    return queryset[start:end] # 切片后面不能再用order,filter方法，一般在最后的结果再切片
-        return None
+                    queryset = queryset[start:end] # 切片后面不能再用order,filter方法，一般在最后的结果再切片
+        return queryset
 
 
 class WorkbookFileViewSet(viewsets.ModelViewSet):

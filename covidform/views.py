@@ -1,6 +1,7 @@
 from django.http.response import JsonResponse
 
 # Create your views here.
+import math
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,7 @@ from datetime import datetime, timedelta
 from .models import TempInto, TempintoFile, OvertimeInto, OvertimeIntoFile,Clrc,ClrcFile
 from .serializers import TempIntoSerializer, TempintoFileSerializer, OvertimeIntoSerializer,OvertimeIntoFileSerializer,ClrcSerializer,ClrcFileSerializer
 from django.conf import settings
+from django.db.models import Q
 
 
 class TempIntoViewSet(viewsets.ModelViewSet):
@@ -144,20 +146,26 @@ class ClrcViewSet(viewsets.ModelViewSet):
     serializer_class = ClrcSerializer
 
     def get_queryset(self):
-        queryset = Clrc.objects.prefetch_related('files').all()
-        status = self.request.query_params.get('status')
-        days = self.request.query_params.get('days')
-        session = self.request.query_params.get('session')
-        if(status and status.isnumeric()):
-            queryset = queryset.filter(status=status)
-        if(days and days.isnumeric()):
-            end_date = datetime.today()
-            start_date = end_date - timedelta(days=int(days))
-            queryset = queryset.filter(
-                create_time__range=[start_date, end_date])
-        if(session):
-            queryset = queryset.filter(session=session)
-        return queryset.order_by("-create_time")
+        queryset = Clrc.objects.prefetch_related('files').all().order_by("-create_time")
+        wx_session = self.request.query_params.get('wx_session')
+        pagesize = self.request.query_params.get('pagesize')
+        page = self.request.query_params.get('page')
+        search = self.request.query_params.get('search')
+        if(search):
+            queryset = queryset.filter(Q(gcmc__icontains=search) | Q(sgdw__icontains=search) | Q(cphm__icontains=search) | Q(sqly__icontains=search) | Q(dclxrxm__icontains=search) | Q(cx__icontains=search))
+        if(wx_session):
+            queryset = queryset.filter(wx_session=wx_session)
+        if(page and page.isnumeric()):
+            if(pagesize and pagesize.isnumeric()):
+                int_page = int(page)
+                int_pagesize = int(pagesize)
+                max_page = math.ceil(queryset.count()/int_pagesize)
+                if(int_page>0 and int_page<=max_page):
+                    start = (int_page -1)*int_pagesize
+                    end = int_page * int_pagesize
+                    queryset = queryset[start:end] # 切片后面不能再用order,filter方法，一般在最后的结果再切片
+        return queryset
+       
 
 
 class ClrcFileViewSet(viewsets.ModelViewSet):
@@ -169,6 +177,27 @@ class ClrcFileViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {'clrc_id': self.kwargs['clrc_pk']}
 
+
+class GetMaxPage(APIView):
+    def get(self, request):
+        queryset = Clrc.objects.all()
+        wx_session = self.request.query_params.get('wx_session')
+        pagesize = self.request.query_params.get('pagesize')
+        search = self.request.query_params.get('search').strip()
+        if(search):
+            queryset = queryset.filter(Q(gcmc__icontains=search) | Q(sgdw__icontains=search) | Q(cphm__icontains=search) | Q(sqly__icontains=search) | Q(dclxrxm__icontains=search) | Q(cx__icontains=search))
+        if(wx_session):
+            queryset = queryset.filter(wx_session=wx_session)
+        if(pagesize and pagesize.isnumeric()):
+            int_pagesize = int(pagesize)
+            count = queryset.count()
+            max_page = math.ceil(count/int_pagesize)
+            return JsonResponse({
+                "max_page": max_page,
+            })
+        return JsonResponse({
+            "max_page": None
+        })
 
 class QJClrc(APIView):
     def get(self, request):

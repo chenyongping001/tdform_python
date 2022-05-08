@@ -72,7 +72,10 @@ def wx_getHfWxUser(request,code,session):
             wx_user.phone_number = phone_number
             wx_user.save()
             if(hf_user):
-                return JsonResponse({"wx_username": hf_user.username})
+                return JsonResponse({
+                    "wx_username": hf_user.username,
+                    "can_add":hf_user.can_add,
+                    })
 
         return JsonResponse({"wx_username": None})
     return JsonResponse({"phone_info": None})
