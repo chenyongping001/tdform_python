@@ -5,3 +5,4 @@ from . import models
 
 admin.site.register(models.WXUser)
 admin.site.register(models.HfWxUser)
+admin.site.register(models.TOTP)

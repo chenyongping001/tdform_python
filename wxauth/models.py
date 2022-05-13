@@ -15,3 +15,11 @@ class HfWxUser(models.Model):
     phone_number = models.CharField(max_length=20)
     can_add = models.BooleanField(default=False)
 
+# 保存TOTP信息
+class TOTP(models.Model):
+    session = models.CharField(max_length=255)
+    isuser = models.CharField(max_length=255,null=True,blank=True)
+    remark = models.CharField(max_length=255,null=True,blank=True)
+    secret = models.CharField(max_length=255)
+    create_date = models.DateTimeField(auto_now_add=True)
+

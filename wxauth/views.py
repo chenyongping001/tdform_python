@@ -1,12 +1,15 @@
-# from asyncio.windows_events import NULL
-from contextlib import nullcontext
 import requests
 import hashlib
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from rest_framework import viewsets
+from rest_framework.views import APIView
+import json
+from django.forms.models import model_to_dict
 
 from django.conf import settings
-from wxauth.models import WXUser,HfWxUser
+from wxauth.models import WXUser,HfWxUser,TOTP
+from .serializers import TOTPSerializer
 
 # Create your views here.
 
@@ -90,3 +93,27 @@ def wx_getUserFromSession(request,session):
                 "can_add":hf_user.can_add,
                 })
     return JsonResponse({"wx_username": None})
+
+
+class TOTPViewSet(viewsets.ModelViewSet):
+    serializer_class = TOTPSerializer
+    def get_queryset(self):
+        queryset = TOTP.objects.all()
+        session = self.request.query_params.get('session')
+        if(session):
+            queryset = queryset.filter(session=session)
+        return queryset
+
+class UsefulTotp(APIView):
+    def post(self, request):
+        data = json.loads(self.request.body.decode('utf-8'))
+        id = data.get("id")
+        isuser = data.get("isuser")
+        remark = data.get("remark")
+        if(id):
+            try:
+                TOTP.objects.filter(id=id).update(isuser=isuser,remark=remark)
+                return JsonResponse(model_to_dict(TOTP.objects.get(id=id)))
+            except:
+                pass
+        return JsonResponse({})
